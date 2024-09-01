@@ -69,6 +69,9 @@ vim.opt.scrolloff = 10
 vim.keymap.set('n', '<Esc>', '<cmd>nohlsearch<CR>')
 vim.keymap.set('n', '<leader>qq', '<cmd>qa<CR>', { desc = 'Quit' })
 
+-- Map Cmd+Space to select the entire scope
+vim.keymap.set('n', '<C-Space>', 'vaB', { noremap = true, silent = true, desc = 'Select entire scope' })
+
 -- Diagnostic keymaps
 vim.keymap.set('n', '<leader>q', vim.diagnostic.setloclist, { desc = 'Open diagnostic [Q]uickfix list' })
 
@@ -360,6 +363,7 @@ require('lazy').setup({
           end,
         },
       }
+      require('lspconfig').biome.setup {}
     end,
   },
 
@@ -388,10 +392,11 @@ require('lazy').setup({
       end,
       formatters_by_ft = {
         lua = { 'stylua' },
-        typescript = { 'prettierd', 'prettier', stop_after_first = true },
-        typescriptreact = { 'prettierd', 'prettier', stop_after_first = true },
-        javascript = { 'prettierd', 'prettier', stop_after_first = true },
-        javascriptreact = { 'prettierd', 'prettier', stop_after_first = true },
+        javascript = { 'biome' },
+        typescript = { 'biome' },
+        javascriptreact = { 'biome' },
+        typescriptreact = { 'biome' },
+        json = { 'biome' },
       },
     },
   },
