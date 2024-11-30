@@ -28,6 +28,7 @@ return { -- Autoformat
       javascriptreact = { 'biome' },
       typescriptreact = { 'biome' },
       json = { 'biome' },
+      svelte = { 'biome' },
     },
   },
 }
