@@ -2,24 +2,11 @@ return {
   -- Main LSP Configuration
   'neovim/nvim-lspconfig',
   dependencies = {
-    { 'Bilal2453/luvit-meta', lazy = true },
-    {
-      -- `lazydev` configures Lua LSP for your Neovim config, runtime and plugins
-      -- used for completion, annotations and signatures of Neovim apis
-      'folke/lazydev.nvim',
-      ft = 'lua',
-      opts = {
-        library = {
-          -- Load luvit types when the `vim.uv` word is found
-          { path = 'luvit-meta/library', words = { 'vim%.uv' } },
-        },
-      },
-    },
     { 'williamboman/mason.nvim', config = true },
     'williamboman/mason-lspconfig.nvim',
     'WhoIsSethDaniel/mason-tool-installer.nvim',
     { 'j-hui/fidget.nvim', opts = {} },
-    { 'folke/lazydev.nvim', opts = {} },
+    'hrsh7th/cmp-nvim-lsp',
   },
   config = function()
     vim.api.nvim_create_autocmd('LspAttach', {
@@ -82,9 +69,9 @@ return {
         end
 
         -- inlay hints
-        if client and client.server_capabilities.inlayHintProvider and vim.lsp.inlay_hint then
+        if client and client.supports_method(vim.lsp.protocol.Methods.textDocument_inlayHint) then
           map('<leader>th', function()
-            vim.lsp.inlay_hint.enable(not vim.lsp.inlay_hint.is_enabled)
+            vim.lsp.inlay_hint.enable(not vim.lsp.inlay_hint.is_enabled { bufnr = event.buf })
           end, '[T]oggle Inlay [H]ints')
         end
       end,
@@ -102,9 +89,11 @@ return {
             completion = {
               callSnippet = 'Replace',
             },
+            diagnostics = { disable = { 'missing-fields' } },
           },
         },
       },
+      ts_ls = {},
     }
 
     require('mason').setup()
@@ -122,11 +111,12 @@ return {
         function(server_name)
           local server = servers[server_name] or {}
           -- This handles overriding only values explicitly passed
+          -- by the server configuration above. Useful when disabling
+          -- certain features of an LSP (for example, turning off formatting for ts_ls)
           server.capabilities = vim.tbl_deep_extend('force', {}, capabilities, server.capabilities or {})
           require('lspconfig')[server_name].setup(server)
         end,
       },
     }
-    require('lspconfig').biome.setup {}
   end,
 }
